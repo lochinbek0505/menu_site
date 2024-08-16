@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:menu_application/models/meal.dart';
 
@@ -27,24 +28,60 @@ class _DetailesPageState extends State<DetailesPage> {
           image: AssetImage("assets/bg_details.png"),
         ),
       ),
-      child: body(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: InkWell(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Expanded(child: body(getMeals()[widget._selectedItemIndex])),
+        ],
+      ),
     );
   }
 
-  Widget body() {
+  List<Meal> getMeals() {
+    switch (context.locale.toString()) {
+      case 'uz_UZ':
+        {
+          return Meal.mealsUz;
+        }
+      case 'ru_RU':
+        {
+          return Meal.mealsRu;
+        }
+      case 'en_US':
+        {
+          return Meal.mealsEn;
+        }
+      default:
+        return Meal.mealsRu;
+    }
+  }
+
+  Widget body(Meal meal) {
     return Container(
-      margin: EdgeInsets.only(top: 80, right: 30),
+      margin: EdgeInsets.only(top: 40, right: 30),
       color: Colors.white,
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.center,
         children: [
-          detailes(),
+          detailes(meal),
           Positioned(
               top: -72,
               right: -48,
               child: Image.asset(
-                Meal.mealsRu[widget._selectedItemIndex].imageUrl!,
+                meal.imageUrl!,
                 // height: 320,
                 width: 210,
               ))
@@ -53,7 +90,7 @@ class _DetailesPageState extends State<DetailesPage> {
     );
   }
 
-  Widget detailes() {
+  Widget detailes(Meal meal) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: Column(
@@ -63,7 +100,7 @@ class _DetailesPageState extends State<DetailesPage> {
             height: 130,
           ),
           Text(
-            Meal.mealsRu[widget._selectedItemIndex].name!,
+            meal.name!,
             style: TextStyle(
               fontWeight: FontWeight.w700,
               fontSize: 28,
@@ -84,7 +121,7 @@ class _DetailesPageState extends State<DetailesPage> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    Meal.mealsRu[widget._selectedItemIndex].time!,
+                    meal.time!,
                     style: const TextStyle(
                         color: Color(0xff52616B), fontWeight: FontWeight.w600),
                   ),

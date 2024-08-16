@@ -1,8 +1,12 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:menu_application/main_provider.dart';
 import 'package:menu_application/models/meal.dart';
 import 'package:menu_application/sreens/detailes_page.dart';
+import 'package:menu_application/widgets/product_item.dart';
+import 'package:provider/provider.dart';
 
 class DishesPage extends StatefulWidget {
   DishesPage({super.key});
@@ -12,269 +16,106 @@ class DishesPage extends StatefulWidget {
 }
 
 class _DishesPageState extends State<DishesPage> {
-  bool _isItemSelected = false;
-  int _selectedItem = 0;
-
   @override
   Widget build(BuildContext context) {
+    final mainProvider = Provider.of<MainProvider>(context, listen: false);
+
     return WillPopScope(
       onWillPop: () {
-        _isItemSelected
+        mainProvider.getItemSelected()
             ? setState(() {
-                _isItemSelected = false;
+                mainProvider.isItemSelected(false);
               })
             : exit(0);
 
         return Future.value(false);
       },
-      child: SafeArea(
-        child: _isItemSelected
-            ? DetailesPage(_selectedItem)
-            : Scaffold(
-                body: Padding(
-                padding: const EdgeInsets.fromLTRB(12.0, 0, 12, 0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Text(
-                    //   "Мы очень рады, что вы выбрали наш ресторан.\nМы надеемся, что вам понравится наш ресторан",
-                    //   style: TextStyle(
-                    //     fontSize: 16,
-                    //   ),
-                    // ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 12.0),
-                        child: GridView.builder(
-                          itemCount: Meal.mealsRu.length,
-                          scrollDirection: Axis.vertical,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                  childAspectRatio: 2 / 1,
-                                  crossAxisCount: 1,
-                                  mainAxisExtent: 385,
-                                  crossAxisSpacing: 20,
-                                  mainAxisSpacing: 32),
-                          itemBuilder: (BuildContext context, int index) {
-                            return meal(Meal.mealsRu[index], context, index);
-                          },
-                        ),
-                      ),
+      child: Consumer<MainProvider>(
+        builder: (context, data, child) {
+          return SafeArea(
+            child: (mainProvider.getItemSelected())
+                ? DetailesPage(mainProvider.getItemIndex())
+                : Scaffold(
+                    body: Padding(
+                    padding: const EdgeInsets.fromLTRB(12.0, 0, 12, 0),
+                    child: LayoutBuilder(
+                      builder:
+                          (BuildContext context, BoxConstraints constrains) {
+                        return mainUi(constrains);
+                      },
+                      // child: mainUi(),
                     ),
-                  ],
-                ),
-              )),
+                  )),
+          );
+        },
       ),
     );
   }
 
-  Widget meal(Meal meal, context, int index) {
-    return Stack(
-      clipBehavior: Clip.none,
-      alignment: Alignment.center,
+  Widget mainUi(BoxConstraints constrains) {
+    var axisCount = 1;
+    var current = constrains.maxWidth;
+
+    if (current <= 500) {
+      axisCount = 1;
+    } else if (current > 500 && current <= 750) {
+      axisCount = 2;
+    } else if (current > 750 && current <= 1000) {
+      axisCount = 3;
+    } else {
+      axisCount = 4;
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Card(
-          elevation: 48,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
+        Text(
+          "title".tr(),
+          style: TextStyle(
+            fontSize: 16,
           ),
-          child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20.0),
-                color: Color(meal.bannerColor!),
-              ),
-              height: 400,
-              width: 230,
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 80),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 2,
-                          height: 25,
-                          color: const Color(0xff00195C),
-                        ),
-                        SizedBox(width: 4),
-                        Text(meal.type!),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      height: 90,
-                      child: Text(
-                        meal.name!,
-                        maxLines: 3,
-                        style: const TextStyle(
-                            height: 1.3,
-                            fontSize: 24,
-                            color: Color(0xff1E2022),
-                            fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Narxi :',
-                          style: TextStyle(
-                              color: Color(0xff52616B),
-                              fontWeight: FontWeight.w600),
-                        ),
-                        Text(
-                          meal.cost!,
-                          style: TextStyle(
-                              color: Color(0xff52616B),
-                              fontWeight: FontWeight.w600),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Image.asset(
-                              'assets/ic_dish.png',
-                              height: 20,
-                              width: 20,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              meal.time!,
-                              style: const TextStyle(
-                                  color: Color(0xff52616B),
-                                  fontWeight: FontWeight.w600),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Image.asset(
-                              'assets/ic_cal.png',
-                              height: 20,
-                              width: 20,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              "${meal.ingCount} inch",
-                              style: TextStyle(
-                                  color: Color(0xff52616B),
-                                  fontWeight: FontWeight.w600),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Image.asset(
-                            "assets/btn_plus.png",
-                            width: 50,
-                            height: 50,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Container(
-                            height: 50,
-                            width: 130,
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                  shape: MaterialStateProperty.all<
-                                          RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
-                                          side: const BorderSide(
-                                              color: Color(0xff175B8F)))),
-                                  backgroundColor:
-                                      MaterialStateProperty.all<Color>(
-                                          const Color(0xff175B8F))),
-                              onPressed: () {
-                                setState(() {
-                                  _isItemSelected = true;
-                                  _selectedItem = index;
-                                });
-
-                                // Navigator(
-                                //   onGenerateRoute: (setttings) =>
-                                //       MaterialPageRoute(
-                                //           builder: (context) => DetailesPage()),
-                                // );
-
-                                // Navigator.of(context).pushReplacement(
-                                //     MaterialPageRoute(
-                                //         builder: (context) => DetailesPage()));
-                              },
-                              child: Text(
-                                "Batafsil",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 19),
-                              ),
-                            ),
-                          )
-                          // IconButton(
-                          //     onPressed: () {
-                          //       //agar selected bo'lsa remove()
-                          //       // selected bo'lmasa add()
-                          // //       if (widget.isFavourite) {
-                          // //         removeFromFavorite(widget.index);
-                          // //       } else {
-                          // //         addToFavorite();
-                          // //       }
-                          // //     },
-                          // //     icon: widget.isFavourite
-                          // //         ? Icon(Icons.favorite_sharp)
-                          // //         : Icon(Icons.favorite_border_outlined)),
-                          // // Container(
-                          // //   height: 50,
-                          // //   child: ElevatedButton(
-                          // //     style: ButtonStyle(
-                          // //         shape: MaterialStateProperty.all<
-                          // //                 RoundedRectangleBorder>(
-                          // //             RoundedRectangleBorder(
-                          // //                 borderRadius:
-                          // //                     BorderRadius.circular(10.0),
-                          // //                 side: const BorderSide(
-                          // //                     color: Color(0xff175B8F)))),
-                          // //         backgroundColor:
-                          // //             MaterialStateProperty.all<Color>(
-                          // //                 const Color(0xff175B8F))),
-                          // //     onPressed: () {
-                          // //       setState(() {
-                          // //         navigateToDetails();
-                          // //       });
-                          //     },
-                          //     child: Text('more'.tr()),
-                          //   ),
-                          //
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              )),
         ),
-        Positioned(
-            top: -30,
-            right: -8,
-            child: Image.asset(
-              meal.imageUrl!,
-              height: 170,
-            ))
+        SizedBox(
+          height: 12,
+        ),
+        Expanded(
+          child: GridView.builder(
+            padding: EdgeInsets.only(top: 30, bottom: 24),
+            itemCount: Meal.mealsRu.length,
+            scrollDirection: Axis.vertical,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                childAspectRatio: 2 / 1,
+                crossAxisCount: axisCount,
+                mainAxisExtent: 385,
+                crossAxisSpacing: 20,
+                mainAxisSpacing: 32),
+            itemBuilder: (BuildContext context, int index) {
+              return ProductItem(getMeals()[index], index);
+            },
+          ),
+        ),
       ],
     );
+  }
+
+  List<Meal> getMeals() {
+    switch (context.locale.toString()) {
+      case 'uz_UZ':
+        {
+          return Meal.mealsUz;
+        }
+      case 'ru_RU':
+        {
+          return Meal.mealsRu;
+        }
+      case 'en_US':
+        {
+          return Meal.mealsEn;
+        }
+      default:
+        return Meal.mealsRu;
+    }
   }
 }

@@ -1,7 +1,11 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:menu_application/sreens/dishes_page.dart';
+import 'package:menu_application/sreens/favorite_page.dart';
 import 'package:menu_application/sreens/salats_page.dart';
+import 'package:provider/provider.dart';
 
+import '../main_provider.dart';
 import '../models/lang.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,7 +18,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  List<Widget> _pages = [DishesPage(), SalatsPage()];
+  List<Widget> _pages = [FavoritePage(), DishesPage(), SalatsPage()];
 
   var _langs = [
     Lang('uz', true),
@@ -36,62 +40,28 @@ class _HomePageState extends State<HomePage> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          NavigationRail(
-            minWidth: 54,
-            // extended: true,
-            // useIndicator: false,
-            groupAlignment: 0.5,
-            indicatorColor: Color(0xff2A5270),
-            labelType: NavigationRailLabelType.all,
-            selectedLabelTextStyle: TextStyle(
-              color: Colors.white,
-              fontSize: 17,
-            ),
-            onDestinationSelected: (int index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-              // _selectedIndex = index;
+          LayoutBuilder(
+            builder: (
+              BuildContext context,
+              BoxConstraints constraints,
+            ) {
+              return myMenu(constraints);
             },
-            leading: langBuild(),
-            unselectedLabelTextStyle:
-                TextStyle(color: Colors.white70, fontSize: 13),
-            destinations: const [
-              NavigationRailDestination(
-                icon: SizedBox.shrink(),
-                label: RotatedBox(quarterTurns: -1, child: Text('Блюда')),
-              ),
-              NavigationRailDestination(
-                  label: RotatedBox(
-                    quarterTurns: -1,
-                    child: Text("Салаты"),
-                  ),
-                  icon: RotatedBox(quarterTurns: -1, child: Text(""))),
-              NavigationRailDestination(
-                  icon: SizedBox(),
-                  label: RotatedBox(
-                    quarterTurns: -1,
-                    child: Text("Напытки"),
-                  )),
-              NavigationRailDestination(
-                  icon: SizedBox(),
-                  label: RotatedBox(
-                    quarterTurns: -1,
-                    child: Text("Fast - Food"),
-                  )),
-            ],
-            selectedIndex: _selectedIndex,
-            backgroundColor: Color(0xff2A5270),
           ),
-          Expanded(child: _pages[_selectedIndex]),
+          Expanded(
+              child: Navigator(
+            onGenerateRoute: (settings) => MaterialPageRoute(
+              builder: (context) => _pages[_selectedIndex],
+            ),
+          ))
         ],
       ),
     );
   }
 
   Widget langBuild() {
-    // final langProvider = Provider.of<MainProvider>(context, listen: false);
-    // setCurrentLangButton();
+    final langProvider = Provider.of<MainProvider>(context, listen: false);
+    setCurrentLangButton();
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -118,29 +88,29 @@ class _HomePageState extends State<HomePage> {
               _langs.forEach((e) {
                 e.isActive = false;
               });
-              // switch (index) {
-              //   case 0:
-              //     {
-              //       var newLocale = Locale('uz', 'UZ');
-              //       context.setLocale(newLocale);
-              //       langProvider.langChanged();
-              //     }
-              //     break;
-              //   case 1:
-              //     {
-              //       var newLocale = Locale('ru', 'RU');
-              //       context.setLocale(newLocale);
-              //       langProvider.langChanged();
-              //     }
-              //     break;
-              //   case 2:
-              //     {
-              //       var newLocale = Locale('en', 'US');
-              //       context.setLocale(newLocale);
-              //       langProvider.langChanged();
-              //     }
-              //     break;
-              // }
+              switch (index) {
+                case 0:
+                  {
+                    var newLocale = Locale('uz', 'UZ');
+                    context.setLocale(newLocale);
+                    langProvider.langChanged();
+                  }
+                  break;
+                case 1:
+                  {
+                    var newLocale = Locale('ru', 'RU');
+                    context.setLocale(newLocale);
+                    langProvider.langChanged();
+                  }
+                  break;
+                case 2:
+                  {
+                    var newLocale = Locale('en', 'US');
+                    context.setLocale(newLocale);
+                    langProvider.langChanged();
+                  }
+                  break;
+              }
               _langs[index].isActive = true;
             });
           },
@@ -172,41 +142,116 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-// void setCurrentLangButton() {
-//   switch (context.locale.toString()) {
-//     case 'uz_UZ':
-//       {
-//         _langs.forEach((element) {
-//           if (element.name == 'uz') {
-//             element.isActive = true;
-//           } else {
-//             element.isActive = false;
-//           }
-//         });
-//       }
-//       break;
-//     case 'ru_RU':
-//       {
-//         _langs.forEach((element) {
-//           if (element.name == 'ru') {
-//             element.isActive = true;
-//           } else {
-//             element.isActive = false;
-//           }
-//         });
-//       }
-//       break;
-//     case 'en_US':
-//       {
-//         _langs.forEach((element) {
-//           if (element.name == 'en') {
-//             element.isActive = true;
-//           } else {
-//             element.isActive = false;
-//           }
-//         });
-//       }
-//       break;
-//   }
-// }
+  Widget myMenu(BoxConstraints constraints) {
+    final mainProvider = Provider.of<MainProvider>(context, listen: false);
+
+    return SingleChildScrollView(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: constraints.maxHeight),
+        child: IntrinsicHeight(
+          child: NavigationRail(
+            minWidth: 54,
+            // extended: true,
+            // useIndicator: false,
+            groupAlignment: 0.5,
+            indicatorColor: Color(0xff2A5270),
+            labelType: NavigationRailLabelType.all,
+            selectedLabelTextStyle: TextStyle(
+              color: Colors.white,
+              fontSize: 17,
+            ),
+            onDestinationSelected: (int index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+              // _selectedIndex = index;
+            },
+            leading: langBuild(),
+            unselectedLabelTextStyle:
+                TextStyle(color: Colors.white70, fontSize: 13),
+            destinations: [
+              NavigationRailDestination(
+                  icon: SizedBox(),
+                  label: RotatedBox(
+                    quarterTurns: 0,
+                    child: IconButton(
+                        onPressed: () {},
+                        icon: Icon(
+                          Icons.favorite_border,
+                          color: Colors.white,
+                        )),
+                  )),
+              NavigationRailDestination(
+                icon: SizedBox(),
+                label: RotatedBox(
+                  quarterTurns: -1,
+                  child: Text(
+                    'meals'.tr(),
+                  ),
+                ),
+              ),
+              NavigationRailDestination(
+                  icon: SizedBox(),
+                  label: RotatedBox(
+                    quarterTurns: -1,
+                    child: Text("salads".tr()),
+                  )),
+              NavigationRailDestination(
+                  icon: SizedBox(),
+                  label: RotatedBox(
+                    quarterTurns: -1,
+                    child: Text("drinks".tr()),
+                  )),
+              NavigationRailDestination(
+                  icon: SizedBox(),
+                  label: RotatedBox(
+                    quarterTurns: -1,
+                    child: Text("fast_food".tr()),
+                  )),
+            ],
+            selectedIndex: _selectedIndex,
+            backgroundColor: Color(0xff2A5270),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void setCurrentLangButton() {
+    switch (context.locale.toString()) {
+      case 'uz_UZ':
+        {
+          _langs.forEach((element) {
+            if (element.name == 'uz') {
+              element.isActive = true;
+            } else {
+              element.isActive = false;
+            }
+          });
+        }
+        break;
+      case 'ru_RU':
+        {
+          _langs.forEach((element) {
+            if (element.name == 'ru') {
+              element.isActive = true;
+            } else {
+              element.isActive = false;
+            }
+          });
+        }
+        break;
+      case 'en_US':
+        {
+          _langs.forEach((element) {
+            if (element.name == 'en') {
+              element.isActive = true;
+            } else {
+              element.isActive = false;
+            }
+          });
+        }
+        break;
+    }
+  }
 }
