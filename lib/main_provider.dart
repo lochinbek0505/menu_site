@@ -32,10 +32,10 @@ class MainProvider extends ChangeNotifier {
   }
 
   Future<int?> getFavorite() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    if (sharedPreferences.containsKey(Constants.FAV_MEAL)) {
-      return sharedPreferences.getInt(Constants.FAV_MEAL);
+    if (prefs.containsKey(Constants.FAV_MEAL)) {
+      return prefs.getInt(Constants.FAV_MEAL);
     }
     return null;
   }
@@ -46,28 +46,24 @@ class MainProvider extends ChangeNotifier {
 // }
 
 // Future<int?> getFavourite() async {
-//   SharedPreferences prefs = await SharedPreferences.getInstance();
 //
-//   if (prefs.containsKey(Constants.FAV_MEAL)) {
-//     return prefs.getInt(Constants.FAV_MEAL);
-//   }
-// }
+// // }
 
-// setFavList(List<int> indexes) async {
-//   SharedPreferences prefs = await SharedPreferences.getInstance();
-//   prefs.setStringList(
-//     Constants.FAV_MEALS,
-//     indexes.map((e) => e.toString()).toList(),
-//   );
-//   notifyListeners();
-// }
+  setFavList(List<int> indexes) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(
+      Constants.FAV_MEALS,
+      indexes.map((e) => e.toString()).toList(),
+    );
+    notifyListeners();
+  }
 
-// Future<List<int>> getFavList() async {
-//   SharedPreferences prefs = await SharedPreferences.getInstance();
-//   List<String>? res = prefs.getStringList(Constants.FAV_MEALS);
-//   if (res != null) {
-//     return res.map((e) => int.parse(e)).toList();
-//   }
-//   return List.empty();
-// }
+  Future<List<int>> getFavList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? res = prefs.getStringList(Constants.FAV_MEALS);
+    if (res != null) {
+      return res.map((e) => int.parse(e)).toList();
+    }
+    return List.empty();
+  }
 }

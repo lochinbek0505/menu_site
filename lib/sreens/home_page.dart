@@ -16,9 +16,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
 
-  List<Widget> _pages = [FavoritePage(), DishesPage(), SalatsPage()];
+  List<Widget> _pages = [FavouritePage(), DishesPage(), SalatsPage()];
 
   var _langs = [
     Lang('uz', true),
@@ -171,16 +171,13 @@ class _HomePageState extends State<HomePage> {
                 TextStyle(color: Colors.white70, fontSize: 13),
             destinations: [
               NavigationRailDestination(
-                  icon: SizedBox(),
-                  label: RotatedBox(
-                    quarterTurns: 0,
-                    child: IconButton(
-                        onPressed: () {},
-                        icon: Icon(
-                          Icons.favorite_border,
-                          color: Colors.white,
-                        )),
-                  )),
+                  icon: IconButton(
+                      onPressed: () {},
+                      icon: Icon(
+                        Icons.favorite_border,
+                        color: Colors.white,
+                      )),
+                  label: SizedBox()),
               NavigationRailDestination(
                 icon: SizedBox(),
                 label: RotatedBox(

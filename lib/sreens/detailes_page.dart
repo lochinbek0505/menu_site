@@ -1,11 +1,18 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:menu_application/models/meal.dart';
+import 'package:provider/provider.dart';
+
+import '../main_provider.dart';
+import '../models/salad.dart';
+import '../utils/product_type.dart';
 
 class DetailesPage extends StatefulWidget {
-  final int _selectedItemIndex;
+  final int selectedItemIndex;
+  final ProductType productType;
 
-  const DetailesPage(this._selectedItemIndex, {super.key});
+  const DetailesPage(this.selectedItemIndex, this.productType, {Key? key})
+      : super(key: key);
 
   @override
   State<DetailesPage> createState() => _DetailesPageState();
@@ -15,35 +22,287 @@ class _DetailesPageState extends State<DetailesPage> {
   // final List<Lang> _langs = [
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: double.infinity,
-      decoration: BoxDecoration(
-        // boxShadow: [BoxShadow(
-        //
-        //   color:
-        //
-        // )],
-        image: DecorationImage(
-          fit: BoxFit.cover,
-          image: AssetImage("assets/bg_details.png"),
+    return Consumer<MainProvider>(builder: (context, data, child) {
+      return Material(
+        child: Container(
+          height: double.infinity,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.cover,
+              image: AssetImage('assets/bg_details.png'),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                  padding: const EdgeInsets.only(left: 12, top: 12),
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                      size: 36,
+                    ),
+                  )),
+              Expanded(child: myBody(context)),
+            ],
+          ),
         ),
+      );
+    });
+  }
+
+  Widget myBody(context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 40, right: 30),
+      color: Colors.white,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          buildUi(),
+          Positioned(
+              top: -72,
+              right: -48,
+              child: Hero(
+                tag: widget.selectedItemIndex.toString(),
+                child: Image.asset(
+                  getMeals()[widget.selectedItemIndex].imageUrl!,
+                  height: 220,
+                ),
+              ))
+        ],
       ),
+    );
+  }
+
+  Widget detailsMeals(Meal meal) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 12, right: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: InkWell(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-              ),
+          const SizedBox(height: 140),
+          Text(
+            meal.name!,
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w700,
             ),
           ),
-          Expanded(child: body(getMeals()[widget._selectedItemIndex])),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Image.asset(
+                    'assets/ic_dish.png',
+                    height: 20,
+                    width: 20,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '20 мин',
+                    style: const TextStyle(
+                        color: Color(0xff52616B), fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Image.asset(
+                    'assets/ic_cal.png',
+                    height: 20,
+                    width: 20,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '5 инг',
+                    style: TextStyle(
+                        color: Color(0xff52616B), fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Image.asset(
+                    'assets/ic_kkal.png',
+                    height: 20,
+                    width: 20,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '438 кал',
+                    style: TextStyle(
+                        color: Color(0xff52616B), fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            Meal.mealsRu[0].details!,
+            style: const TextStyle(fontSize: 16, height: 1.4),
+            textAlign: TextAlign.left,
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget detailsSalad(Salad salad) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 12, right: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // const SizedBox(height: 140),
+          // Text(
+          //   salad,
+          //   style: TextStyle(
+          //     fontSize: 26,
+          //     fontWeight: FontWeight.w700,
+          //   ),
+          // ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Image.asset(
+                    'assets/ic_dish.png',
+                    height: 20,
+                    width: 20,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '20 мин',
+                    style: const TextStyle(
+                        color: Color(0xff52616B), fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Image.asset(
+                    'assets/ic_cal.png',
+                    height: 20,
+                    width: 20,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '5 инг',
+                    style: TextStyle(
+                        color: Color(0xff52616B), fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Image.asset(
+                    'assets/ic_kkal.png',
+                    height: 20,
+                    width: 20,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '438 кал',
+                    style: TextStyle(
+                        color: Color(0xff52616B), fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            Meal.mealsRu[0].details!,
+            style: const TextStyle(fontSize: 16, height: 1.4),
+            textAlign: TextAlign.left,
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget detailsDrink(Salad salad) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 12, right: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 140),
+          // Text(
+          //   meal.name!,
+          //   style: TextStyle(
+          //     fontSize: 26,
+          //     fontWeight: FontWeight.w700,
+          //   ),
+          // ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Image.asset(
+                    'assets/ic_dish.png',
+                    height: 20,
+                    width: 20,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '20 мин',
+                    style: const TextStyle(
+                        color: Color(0xff52616B), fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Image.asset(
+                    'assets/ic_cal.png',
+                    height: 20,
+                    width: 20,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '5 инг',
+                    style: TextStyle(
+                        color: Color(0xff52616B), fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Image.asset(
+                    'assets/ic_kkal.png',
+                    height: 20,
+                    width: 20,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '438 кал',
+                    style: TextStyle(
+                        color: Color(0xff52616B), fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            Meal.mealsRu[0].details!,
+            style: const TextStyle(fontSize: 16, height: 1.4),
+            textAlign: TextAlign.left,
+          )
         ],
       ),
     );
@@ -68,109 +327,40 @@ class _DetailesPageState extends State<DetailesPage> {
     }
   }
 
-  Widget body(Meal meal) {
-    return Container(
-      margin: EdgeInsets.only(top: 40, right: 30),
-      color: Colors.white,
-      child: Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.center,
-        children: [
-          detailes(meal),
-          Positioned(
-              top: -72,
-              right: -48,
-              child: Image.asset(
-                meal.imageUrl!,
-                // height: 320,
-                width: 210,
-              ))
-        ],
-      ),
-    );
+  List<Salad> getSalads() {
+    switch (context.locale.toString()) {
+      case 'uz_UZ':
+        {
+          return Salad.saladsRu;
+        }
+      case 'ru_RU':
+        {
+          return Salad.saladsRu;
+        }
+      case 'en_US':
+        {
+          return Salad.saladsRu;
+        }
+      default:
+        return Salad.saladsRu;
+    }
   }
 
-  Widget detailes(Meal meal) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            height: 130,
-          ),
-          Text(
-            meal.name!,
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 28,
-            ),
-          ),
-          SizedBox(
-            height: 16,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Image.asset(
-                    'assets/ic_dish.png',
-                    height: 18,
-                    width: 18,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    meal.time!,
-                    style: const TextStyle(
-                        color: Color(0xff52616B), fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Image.asset(
-                    'assets/ic_cal.png',
-                    height: 18,
-                    width: 18,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    "${Meal.mealsRu[widget._selectedItemIndex].ingCount} inch",
-                    style: TextStyle(
-                        color: Color(0xff52616B), fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Image.asset(
-                    'assets/ic_kkal.png',
-                    height: 18,
-                    width: 18,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    "445 kkal ",
-                    style: TextStyle(
-                        color: Color(0xff52616B), fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Text(
-            Meal.mealsRu[widget._selectedItemIndex].details!,
-            style: TextStyle(
-              fontSize: 16,
-            ),
-            textAlign: TextAlign.left,
-          ),
-        ],
-      ),
-    );
+  Widget buildUi() {
+    switch (widget.productType) {
+      case ProductType.DISH:
+        {
+          return detailsMeals(getMeals()[widget.selectedItemIndex]);
+        }
+      case ProductType.SALAD:
+        {
+          return detailsSalad(getSalads()[widget.selectedItemIndex]);
+        }
+      case ProductType.DRINK:
+        {
+          return detailsDrink(getSalads()[widget.selectedItemIndex]);
+        }
+    }
+    return detailsMeals(getMeals()[widget.selectedItemIndex]);
   }
 }

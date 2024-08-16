@@ -1,12 +1,11 @@
-import 'dart:io';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:menu_application/main_provider.dart';
 import 'package:menu_application/models/meal.dart';
-import 'package:menu_application/sreens/detailes_page.dart';
 import 'package:menu_application/widgets/product_item.dart';
 import 'package:provider/provider.dart';
+
+import '../utils/product_type.dart';
 
 class DishesPage extends StatefulWidget {
   DishesPage({super.key});
@@ -18,38 +17,15 @@ class DishesPage extends StatefulWidget {
 class _DishesPageState extends State<DishesPage> {
   @override
   Widget build(BuildContext context) {
-    final mainProvider = Provider.of<MainProvider>(context, listen: false);
-
-    return WillPopScope(
-      onWillPop: () {
-        mainProvider.getItemSelected()
-            ? setState(() {
-                mainProvider.isItemSelected(false);
-              })
-            : exit(0);
-
-        return Future.value(false);
-      },
-      child: Consumer<MainProvider>(
-        builder: (context, data, child) {
-          return SafeArea(
-            child: (mainProvider.getItemSelected())
-                ? DetailesPage(mainProvider.getItemIndex())
-                : Scaffold(
-                    body: Padding(
-                    padding: const EdgeInsets.fromLTRB(12.0, 0, 12, 0),
-                    child: LayoutBuilder(
-                      builder:
-                          (BuildContext context, BoxConstraints constrains) {
-                        return mainUi(constrains);
-                      },
-                      // child: mainUi(),
-                    ),
-                  )),
-          );
-        },
-      ),
-    );
+    return Consumer<MainProvider>(builder: (context, data, child) {
+      return SafeArea(child: Scaffold(
+        body: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            return mainUi(constraints);
+          },
+        ),
+      ));
+    });
   }
 
   Widget mainUi(BoxConstraints constrains) {
@@ -71,10 +47,13 @@ class _DishesPageState extends State<DishesPage> {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "title".tr(),
-          style: TextStyle(
-            fontSize: 16,
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            "title".tr(),
+            style: TextStyle(
+              fontSize: 16,
+            ),
           ),
         ),
         SizedBox(
@@ -92,7 +71,31 @@ class _DishesPageState extends State<DishesPage> {
                 crossAxisSpacing: 20,
                 mainAxisSpacing: 32),
             itemBuilder: (BuildContext context, int index) {
-              return ProductItem(getMeals()[index], index);
+              return FutureBuilder(
+                  future: getFavourites(),
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    if (snapshot.hasData) {
+                      if (snapshot.data.contains(index)) {
+                        return ProductItem(
+                          getMeals()[index],
+                          index,
+                          isFavourite: true,
+                          productType: ProductType.DISH,
+                        );
+                      } else {
+                        return ProductItem(
+                          getMeals()[index],
+                          index,
+                          isFavourite: false,
+                          productType: ProductType.DISH,
+                        );
+                      }
+                    } else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    // return ProductItem(getMeals()[index], index,
+                    //     isFavourite: snapshot.data.contains(index));
+                  });
             },
           ),
         ),
@@ -117,5 +120,10 @@ class _DishesPageState extends State<DishesPage> {
       default:
         return Meal.mealsRu;
     }
+  }
+
+  Future<List<int>> getFavourites() async {
+    final mainProvider = Provider.of<MainProvider>(context, listen: false);
+    return await mainProvider.getFavList();
   }
 }
