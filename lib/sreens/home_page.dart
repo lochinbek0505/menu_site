@@ -18,7 +18,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 1;
 
-  List<Widget> _pages = [FavouritePage(), DishesPage(), SalatsPage()];
+  List<Widget> _pages = [
+    FavouritePage(),
+    DishesPage(),
+    SalatsPage(),
+    DishesPage(),
+    DishesPage()
+  ];
 
   var _langs = [
     Lang('uz', true),
